@@ -9,7 +9,7 @@ const ReportItem = () => {
   const [formData, setFormData] = useState({
     title: '',
     type: searchParams.get('reportType') === 'Found' ? 'Found' : 'Lost',
-    category: 'Electronics',
+    category: 'Select',
     description: '',
     location: '',
     date: '',
