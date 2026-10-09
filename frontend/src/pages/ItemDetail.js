@@ -12,7 +12,7 @@ import BackButton from '../components/BackButton';
 import { useAuth } from '../context/AuthContext';
 
 const BACKEND_URL =
-  'http://localhost:5000';
+  'https://findback-backend-aba3.onrender.com';
 
 const ItemDetail = () => {
   const { id } = useParams();
@@ -74,15 +74,22 @@ const ItemDetail = () => {
     fetchItem();
   }, [id]);
 
-  const getImageUrl = (image) => {
-    if (!image) return null;
+  
+const getImageUrl = (image) => {
+  if (!image) return null;
 
-    if (image.startsWith('http')) {
-      return image;
-    }
+  // Already a complete URL
+  if (image.startsWith('http')) {
+    return image;
+  }
 
-    return `${BACKEND_URL}${image}`;
-  };
+  // Relative image path
+  const imagePath = image.startsWith('/')
+    ? image
+    : `/${image}`;
+
+  return `${BACKEND_URL}${imagePath}`;
+};
 
   const handleClaim = async () => {
     if (!user) {
@@ -210,13 +217,21 @@ const ItemDetail = () => {
     );
   }
 
-  const formattedDate = item.date
-    ? new Date(
-        item.date
-      ).toLocaleDateString('en-US', {
-        year: 'numeric',
+console.log('ITEM DATE DEBUG:', {
+  title: item.title,
+  date: item.date,
+  createdAt: item.createdAt,
+});
+
+  
+const itemDate = item.date || item.createdAt;
+
+const formattedDate =
+  itemDate && !Number.isNaN(new Date(itemDate).getTime())
+    ? new Date(itemDate).toLocaleDateString('en-IN', {
+        day: '2-digit',
         month: 'long',
-        day: 'numeric',
+        year: 'numeric',
       })
     : 'N/A';
 

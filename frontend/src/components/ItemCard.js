@@ -4,7 +4,9 @@ import { Link } from 'react-router-dom';
 const PLACEHOLDER_IMAGE =
   'https://via.placeholder.com/300x200?text=No+Image';
 
-const BACKEND_URL = 'http://localhost:5000';
+
+const BACKEND_URL =
+  'https://findback-backend-aba3.onrender.com';
 
 const ItemCard = ({ item }) => {
   const {
