@@ -18,7 +18,10 @@ const app = express();
 
 // CORS configuration
 app.use(cors({
-  origin: ['https://findback-vert.vercel.app'],
+  origin: [
+    'https://findback-vert.vercel.app',
+    'http://localhost:3000'
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
