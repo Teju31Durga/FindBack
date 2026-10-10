@@ -8,22 +8,25 @@ const PLACEHOLDER_IMAGE =
 const BACKEND_URL =
   'https://findback-backend-aba3.onrender.com';
 
-const ItemCard = ({ item }) => {
-  const {
-    _id,
-    title,
-    type,
-    category,
-    location,
-    date,
-    status,
-    image,
-  } = item;
+const {
+  _id,
+  title,
+  type,
+  category,
+  location,
+  date,
+  createdAt,
+  status,
+  image,
+} = item;
 
-  const formattedDate = date
-    ? new Date(date).toLocaleDateString('en-US', {
+const itemDate = date || createdAt;
+
+const formattedDate =
+  itemDate && !Number.isNaN(new Date(itemDate).getTime())
+    ? new Date(itemDate).toLocaleDateString('en-US', {
         year: 'numeric',
-        month: 'short',
+        month: 'long',
         day: 'numeric',
       })
     : 'N/A';
