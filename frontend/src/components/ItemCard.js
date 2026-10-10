@@ -1,42 +1,46 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 
 const PLACEHOLDER_IMAGE =
   'https://via.placeholder.com/300x200?text=No+Image';
 
-
 const BACKEND_URL =
   'https://findback-backend-aba3.onrender.com';
 
-const {
-  _id,
-  title,
-  type,
-  category,
-  location,
-  date,
-  createdAt,
-  status,
-  image,
-} = item;
+const ItemCard = ({ item }) => {
+  const {
+    _id,
+    title,
+    type,
+    category,
+    location,
+    date,
+    createdAt,
+    status,
+    image,
+  } = item;
 
-const itemDate = date || createdAt;
+  // Use date first, otherwise use createdAt
+  const itemDate = date || createdAt;
 
-const formattedDate =
-  itemDate && !Number.isNaN(new Date(itemDate).getTime())
-    ? new Date(itemDate).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
-    : 'N/A';
+  const formattedDate =
+    itemDate && !Number.isNaN(new Date(itemDate).getTime())
+      ? new Date(itemDate).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })
+      : 'N/A';
 
+  // Image URL
   const imageSrc = image
     ? image.startsWith('http')
       ? image
-      : `${BACKEND_URL}${image}`
+      : `${BACKEND_URL}${image.startsWith('/') ? image : `/${image}`}`
     : PLACEHOLDER_IMAGE;
 
+  // Status badge
   const statusClass =
     status === 'Active'
       ? 'badge badge-active'

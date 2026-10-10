@@ -18,30 +18,41 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-  const fetchDashboard = async () => {
-    try {
-      setLoading(true);
+    const fetchDashboard = async () => {
+      try {
+        setLoading(true);
 
-      const res = await api.get('/dashboard');
-      const dashboardData = res.data?.data ?? res.data;
+        const res = await api.get('/dashboard');
+        const dashboardData = res.data?.data ?? res.data;
 
-      setStats({
-        totalLost: dashboardData?.totalLost || 0,
-        totalFound: dashboardData?.totalFound || 0,
-        totalClaimed: dashboardData?.totalClaimed || 0,
-        activeReports: dashboardData?.activeReports || 0,
-      });
+        setStats({
+          totalLost: dashboardData?.totalLost ?? 0,
+          totalFound: dashboardData?.totalFound ?? 0,
+          totalClaimed: dashboardData?.totalClaimed ?? 0,
+          activeReports: dashboardData?.activeReports ?? 0,
+        });
 
-      setRecentItems(dashboardData?.recentItems || []);
-    } catch (err) {
-      console.error('Failed to fetch dashboard data:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+        const items = Array.isArray(dashboardData?.recentItems)
+          ? dashboardData.recentItems
+          : [];
 
-  fetchDashboard();
-}, []);
+        // Ensure each item has a usable date field for ItemCard.
+        const normalizedItems = items.map((item) => ({
+          ...item,
+          date: item.date || item.createdAt || null,
+        }));
+
+        setRecentItems(normalizedItems);
+      } catch (err) {
+        console.error('Failed to fetch dashboard data:', err);
+        setRecentItems([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboard();
+  }, []);
 
   const statCards = [
     {
@@ -76,14 +87,11 @@ const Dashboard = () => {
 
   return (
     <div className="page-container">
-
       <BackButton />
 
       <div className="page-header">
         <h1>Dashboard</h1>
-        <p>
-          Overview of the Lost &amp; Found system
-        </p>
+        <p>Overview of the Lost &amp; Found system</p>
       </div>
 
       {loading ? (
@@ -92,9 +100,7 @@ const Dashboard = () => {
         <>
           {/* Stats */}
           <section className="dashboard-stats">
-
             <div className="dashboard-stats-grid">
-
               {statCards.map((card) => (
                 <div
                   key={card.label}
@@ -105,7 +111,6 @@ const Dashboard = () => {
                   </div>
 
                   <div className="dashboard-stat-content">
-
                     <div className="dashboard-stat-value">
                       {card.value}
                     </div>
@@ -117,20 +122,15 @@ const Dashboard = () => {
                     <div className="dashboard-stat-desc">
                       {card.description}
                     </div>
-
                   </div>
                 </div>
               ))}
-
             </div>
-
           </section>
 
           {/* Recent Reports */}
           <section className="dashboard-recent">
-
             <div className="section-header">
-
               <h2>Recent Reports</h2>
 
               <Link
@@ -139,28 +139,20 @@ const Dashboard = () => {
               >
                 View All →
               </Link>
-
             </div>
 
             {recentItems.length > 0 ? (
               <div className="items-grid">
-
-                {recentItems
-                  .slice(0, 5)
-                  .map((item) => (
-                    <ItemCard
-                      key={item._id}
-                      item={item}
-                    />
-                  ))}
-
+                {recentItems.slice(0, 5).map((item) => (
+                  <ItemCard
+                    key={item._id}
+                    item={item}
+                  />
+                ))}
               </div>
             ) : (
               <div className="empty-state">
-
-                <p>
-                  No items reported yet.
-                </p>
+                <p>No items reported yet.</p>
 
                 <Link
                   to="/report"
@@ -168,27 +160,20 @@ const Dashboard = () => {
                 >
                   Be the First to Report
                 </Link>
-
               </div>
             )}
-
           </section>
 
           {/* Quick Actions */}
           <section className="dashboard-actions">
-
             <h2>Quick Actions</h2>
 
             <div className="quick-actions-grid">
-
               <Link
                 to="/report"
                 className="quick-action-card"
               >
-                <span className="quick-action-icon">
-                  📝
-                </span>
-
+                <span className="quick-action-icon">📝</span>
                 <span className="quick-action-label">
                   Report Item
                 </span>
@@ -198,10 +183,7 @@ const Dashboard = () => {
                 to="/items"
                 className="quick-action-card"
               >
-                <span className="quick-action-icon">
-                  🔍
-                </span>
-
+                <span className="quick-action-icon">🔍</span>
                 <span className="quick-action-label">
                   Browse Items
                 </span>
@@ -211,21 +193,15 @@ const Dashboard = () => {
                 to="/my-reports"
                 className="quick-action-card"
               >
-                <span className="quick-action-icon">
-                  📁
-                </span>
-
+                <span className="quick-action-icon">📁</span>
                 <span className="quick-action-label">
                   My Reports
                 </span>
               </Link>
-
             </div>
-
           </section>
         </>
       )}
-
     </div>
   );
 };
