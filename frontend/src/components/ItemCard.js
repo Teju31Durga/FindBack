@@ -1,14 +1,43 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 
 const PLACEHOLDER_IMAGE =
-  'https://via.placeholder.com/300x200?text=No+Image';
+  'data:image/svg+xml;utf8,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200">' +
+      '<rect width="100%" height="100%" fill="#e5e7eb"/>' +
+      '<text x="50%" y="50%" font-family="Arial" font-size="18" fill="#6b7280" ' +
+      'text-anchor="middle" dominant-baseline="middle">No Image</text>' +
+      '</svg>'
+  );
 
-const BACKEND_URL =
-  'https://findback-backend-aba3.onrender.com';
+const BACKEND_URL = 'https://findback-backend-aba3.onrender.com';
+
+const STATUS_CLASSES = {
+  Active: 'badge badge-active',
+  Claimed: 'badge badge-claimed',
+};
+
+const getImageSrc = (image) => {
+  if (!image) return PLACEHOLDER_IMAGE;
+  if (image.startsWith('http')) return image;
+  return `${BACKEND_URL}${image.startsWith('/') ? image : `/${image}`}`;
+};
+
+const formatDate = (value) => {
+  if (!value) return 'N/A';
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return 'N/A';
+  return d.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+};
 
 const ItemCard = ({ item }) => {
+  if (!item) return null;
+
   const {
     _id,
     title,
@@ -21,53 +50,23 @@ const ItemCard = ({ item }) => {
     image,
   } = item;
 
-  // Use date first, otherwise use createdAt
-  const itemDate = date || createdAt;
+  const formattedDate = formatDate(date || createdAt);
+  const imageSrc = getImageSrc(image);
+  const statusClass = STATUS_CLASSES[status] || 'badge badge-resolved';
 
-  const formattedDate =
-    itemDate && !Number.isNaN(new Date(itemDate).getTime())
-      ? new Date(itemDate).toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        })
-      : 'N/A';
-
-  // Image URL
-  const imageSrc = image
-    ? image.startsWith('http')
-      ? image
-      : `${BACKEND_URL}${image.startsWith('/') ? image : `/${image}`}`
-    : PLACEHOLDER_IMAGE;
-
-  // Status badge
-  const statusClass =
-    status === 'Active'
-      ? 'badge badge-active'
-      : status === 'Claimed'
-      ? 'badge badge-claimed'
-      : 'badge badge-resolved';
+  const typeClass =
+    type === 'Lost'
+      ? 'item-card-type-badge item-card-type-lost'
+      : 'item-card-type-badge item-card-type-found';
 
   return (
     <div className="item-card">
-
       {/* TYPE BADGE + IMAGE */}
       <div className="item-card-image-wrapper">
-
-        {/* LOST / FOUND BADGE */}
         <div className="item-card-type-row">
-          <span
-            className={
-              type === 'Lost'
-                ? 'item-card-type-badge item-card-type-lost'
-                : 'item-card-type-badge item-card-type-found'
-            }
-          >
-            {type}
-          </span>
+          <span className={typeClass}>{type}</span>
         </div>
 
-        {/* IMAGE */}
         <div className="item-card-image-container">
           <img
             src={imageSrc}
@@ -79,50 +78,27 @@ const ItemCard = ({ item }) => {
             }}
           />
         </div>
-
       </div>
 
       {/* CONTENT */}
       <div className="item-card-body">
-
-        <h3 className="item-card-title">
-          {title}
-        </h3>
+        <h3 className="item-card-title">{title}</h3>
 
         <div className="item-card-meta">
-
-          <span className="item-card-category">
-            📂 {category}
-          </span>
-
-          <span className="item-card-location">
-            📍 {location}
-          </span>
-
-          <span className="item-card-date">
-            📅 {formattedDate}
-          </span>
-
+          <span className="item-card-category">📂 {category}</span>
+          <span className="item-card-location">📍 {location}</span>
+          <span className="item-card-date">📅 {formattedDate}</span>
         </div>
 
         {/* FOOTER */}
         <div className="item-card-footer">
+          <span className={statusClass}>{status}</span>
 
-          <span className={statusClass}>
-            {status}
-          </span>
-
-          <Link
-            to={`/items/${_id}`}
-            className="btn btn-primary btn-sm"
-          >
+          <Link to={`/items/${_id}`} className="btn btn-primary btn-sm">
             View Details
           </Link>
-
         </div>
-
       </div>
-
     </div>
   );
 };
